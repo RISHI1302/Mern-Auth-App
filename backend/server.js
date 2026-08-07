@@ -8,6 +8,7 @@ const port = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
 // const secret = process.env.JWT_SECRET;
 const User = require("./models/User.js");
+const bcrypt = require("bcryptjs");
 
 app.use(express.json());
 app.use(cors());
@@ -40,11 +41,13 @@ app.post("/register", async (req, res) => {
                 message: "User already exists",
             });
         }
-        
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const newUser = new User({
             name,
             email,
-            password,
+            password: hashedPassword,
         });
 
         await newUser.save();
