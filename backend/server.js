@@ -7,6 +7,7 @@ dotenv.config();
 const port = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
 // const secret = process.env.JWT_SECRET;
+const User = require("./models/User.js");
 
 app.use(express.json());
 app.use(cors());
