@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
 
           <Route
             path="/profile"
-            element={<h1>Profile</h1>}
+            element={<Profile />}
           />
 
           <Route
