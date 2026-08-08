@@ -128,6 +128,121 @@ app.get("/profile", authMiddleware, async (req, res) => {
     });
 });
 
+app.put("/profile", authMiddleware, async (req, res) => {
+    try {
+        const { name, email } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).json({
+                message: "Name and email are required",
+            });
+        }
+
+        const existingUser = await User.findOne({
+            email,
+            _id: { $ne: req.userId },
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                message: "Email is already in use",
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            {
+                name,
+                email,
+            },  
+            {
+                new: true,
+            }
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Profile updated successfully",
+            profile: {
+                name: user.name,
+                email: user.email,
+            },
+        });
+
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
+    }
+});
+
+app.put("/change-password", authMiddleware, async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({
+                message: "Old password and new password are required",
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                message: "New password must be at least 6 characters",
+            });
+        }
+
+        const user = await User.findById(req.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        const isMatch = await bcrypt.compare(
+            oldPassword,
+            user.password
+        );
+
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Old password is incorrect",
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        user.password = hashedPassword;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password changed successfully",
+        });
+
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
+    }
+});
+
+app.post("/logout", authMiddleware, async (req, res) => {
+    return res.status(200).json({
+        message: "Logout successful",
+    });
+});
+
 app.listen(port, () => {
     console.log(`App listening on the given port: ${port}`);
 });
