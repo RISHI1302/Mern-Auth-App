@@ -109,10 +109,22 @@ app.post("/login", async (req, res) => {
 
 });
 
-app.get("/profile", authMiddleware, (req, res) => {
+app.get("/profile", authMiddleware, async (req, res) => {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found",
+        });
+    }
+
+    const profile = {
+        name: user.name,
+        email: user.email,
+    };
     return res.status(200).json({
         message: "Profile accessed successfully",
-        userId: req.userId,
+        profile,
     });
 });
 
