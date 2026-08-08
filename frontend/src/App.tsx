@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import ChangePassword from "./pages/ChangePassword";
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
 
           <Route
             path="/change-password"
-            element={<h1>Change Password</h1>}
+            element={<ChangePassword />}
           />
 
         </Route>
