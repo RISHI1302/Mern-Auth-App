@@ -7,6 +7,7 @@ dotenv.config();
 const User = require("./models/User.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const authMiddleware = require("./middleware/auth.js");
 
 const port = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
@@ -91,21 +92,28 @@ app.post("/login", async (req, res) => {
 
     if (isMatch === false) {
         return res.status(400).json({
-            message:"Password is incorrect",
+            message: "Password is incorrect",
         });
     }
 
-    const token=jwt.sign(
-        {userId:user._id},
+    const token = jwt.sign(
+        { userId: user._id },
         secret,
-        {expiresIn:"1h"},
+        { expiresIn: "1h" },
     );
 
     return res.status(200).json({
-        message:"Login Successful",
+        message: "Login Successful",
         token,
     });
 
+});
+
+app.get("/profile", authMiddleware, (req, res) => {
+    return res.status(200).json({
+        message: "Profile accessed successfully",
+        userId: req.userId,
+    });
 });
 
 app.listen(port, () => {
